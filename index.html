@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iGaming 규제 현황: 인포그래픽 분석 (AI 기능 탑재)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .kpi-card {
+            background-color: #A9D8FF;
+            color: #004AAD;
+            border-left: 5px solid #0086E5;
+        }
+        .flow-arrow {
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+        }
+        .flow-arrow-right {
+            border-left: 20px solid #004AAD;
+        }
+        .flow-arrow-down {
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid #004AAD;
+        }
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #555;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #0086E5;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-[#f0f4f8] text-[#212529]">
+
+    <!-- Header Section -->
+    <header class="bg-[#004AAD] text-white text-center py-12 px-4">
+        <h1 class="text-4xl md:text-6xl font-black text-shadow">103조 원의 질문</h1>
+        <p class="mt-4 text-lg md:text-2xl text-[#A9D8FF]">대한민국의 iGaming 딜레마: 현상 유지인가, 규제 혁신인가</p>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Section 1: The Uncontrolled Reality in Korea -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-[#004AAD] mb-2">통제 불능의 현실: 대한민국 불법 iGaming 시장</h2>
+            <p class="text-center max-w-3xl mx-auto text-gray-600 mb-8">
+                엄격한 금지주의 정책에도 불구하고, 대한민국의 불법 온라인 도박 시장은 통제를 벗어나 막대한 규모로 성장했습니다. 이는 심각한 사회적 문제를 야기하며, 특히 청소년층에게 큰 위협이 되고 있습니다.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white rounded-lg shadow-xl p-6 text-center">
+                    <h3 class="text-2xl font-bold text-[#0086E5]">불법 시장 규모</h3>
+                    <p class="text-6xl md:text-7xl font-black text-[#004AAD] my-4">약 103조 원</p>
+                    <p class="text-gray-500">(2022년 추정치, 사행산업통합감독위원회)</p>
+                    <div class="mt-4 w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-[#004AAD] h-2.5 rounded-full" style="width: 95%"></div>
+                    </div>
+                    <p class="text-sm mt-2 text-left font-semibold text-[#004AAD]">합법 시장(약 5.1조) 대비 약 20배 규모</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-xl p-6">
+                    <h3 class="text-2xl font-bold text-center text-[#0086E5] mb-4">합법 vs 불법 시장 규모 비교 (조 원)</h3>
+                    <div class="chart-container h-72 md:h-80">
+                        <canvas id="marketComparisonChart"></canvas>
+                    </div>
+                    <p class="text-center text-gray-600 mt-4">금지 정책은 수요를 억제하는 대신, 거대한 비과세 불법 시장을 창출했습니다.</p>
+                </div>
+            </div>
+             <div class="mt-8 bg-white rounded-lg shadow-xl p-6 kpi-card">
+                <h3 class="text-2xl font-bold text-center mb-4">청소년 보호의 실패</h3>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                    <div class="text-6xl font-bold">🚨</div>
+                    <div>
+                        <p class="text-xl md:text-2xl font-bold">사이버 도박 특별단속 검거 인원 중 <span class="text-4xl text-white text-shadow bg-[#0086E5] px-2 rounded">47.3%</span>가 청소년</p>
+                        <p class="mt-1 text-md">(경찰청 자료)</p>
+                         <p class="mt-2 font-semibold">규제의 공백이 가장 취약한 계층을 위험에 노출시키고 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Global Market Growth -->
+        <section class="mb-16 bg-white rounded-lg shadow-xl p-6 md:p-8">
+            <h2 class="text-3xl font-bold text-center text-[#004AAD] mb-2">세계는 지금: 급성장하는 글로벌 iGaming 시장</h2>
+            <p class="text-center max-w-3xl mx-auto text-gray-600 mb-8">
+                전 세계적으로 iGaming은 기술 혁신과 규제 확대를 동력으로 폭발적인 성장을 거듭하며 주요 디지털 경제 부문으로 자리 잡고 있습니다.
+            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+                <div class="lg:col-span-3">
+                    <h3 class="text-2xl font-bold text-center text-[#0086E5] mb-4">글로벌 iGaming 시장 성장 전망 (억 달러)</h3>
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="globalMarketGrowthChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-2">
+                    <h3 class="text-2xl font-bold text-center text-[#0086E5] mb-4">iGaming 생태계 구성</h3>
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="ecosystemDonutChart"></canvas>
+                    </div>
+                     <p class="text-center text-gray-600 mt-4">다양한 분야가 융합되어 새로운 엔터테인먼트 경험을 창출하고 있습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Global Regulatory Models -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-[#004AAD] mb-2">세계의 선택들: 글로벌 규제 모델 비교</h2>
+            <p class="text-center max-w-3xl mx-auto text-gray-600 mb-8">
+                각국은 자국의 사회·경제적 환경에 맞춰 다양한 규제 모델을 채택하고 있습니다. 이는 '허용 여부'가 아닌 '관리 방식'의 문제입니다.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- UK Model -->
+                <div class="bg-white rounded-lg shadow-xl p-6 flex flex-col">
+                    <h3 class="text-xl font-bold text-[#004AAD]">🇬🇧 영국 모델</h3>
+                    <p class="font-semibold text-[#0086E5] mb-2">"소비자 보호 최우선"</p>
+                    <ul class="space-y-2 text-sm list-disc list-inside flex-grow">
+                        <li>강력한 독립 규제기관 (UKGC)</li>
+                        <li>의무적 전국 자가 제외 시스템 (GAMSTOP)</li>
+                        <li>도박 자금 신용카드 사용 전면 금지</li>
+                        <li>데이터 기반의 엄격한 책임감 있는 게임(RG) 정책</li>
+                    </ul>
+                </div>
+                <!-- Malta Model -->
+                <div class="bg-white rounded-lg shadow-xl p-6 flex flex-col">
+                    <h3 class="text-xl font-bold text-[#004AAD]">🇲🇹 몰타 모델</h3>
+                    <p class="font-semibold text-[#0086E5] mb-2">"사업 친화적 허브"</p>
+                    <ul class="space-y-2 text-sm list-disc list-inside flex-grow">
+                        <li>세계 최대 iGaming 라이선스 발급 허브</li>
+                        <li>B2C/B2B로 구분된 효율적인 라이선스 구조</li>
+                        <li>경쟁력 있는 세율로 글로벌 사업자 유치</li>
+                        <li>강력한 AML 및 데이터 보안 기준 적용</li>
+                    </ul>
+                </div>
+                <!-- US Model -->
+                <div class="bg-white rounded-lg shadow-xl p-6 flex flex-col">
+                    <h3 class="text-xl font-bold text-[#004AAD]">🇺🇸 미국 모델</h3>
+                    <p class="font-semibold text-[#0086E5] mb-2">"주별 점진적 합법화"</p>
+                    <ul class="space-y-2 text-sm list-disc list-inside flex-grow">
+                        <li>주(State) 단위의 분절적 규제 환경</li>
+                        <li>스포츠 베팅 합법화가 온라인 카지노 확대 선도</li>
+                        <li>주마다 상이한 세율 및 규제 규칙</li>
+                        <li>오프라인 카지노와 파트너십 요구 모델 다수</li>
+                    </ul>
+                </div>
+                <!-- Japan Model -->
+                <div class="bg-white rounded-lg shadow-xl p-6 flex flex-col">
+                    <h3 class="text-xl font-bold text-[#004AAD]">🇯🇵 일본 모델</h3>
+                    <p class="font-semibold text-[#0086E5] mb-2">"오프라인과 온라인의 모순"</p>
+                    <ul class="space-y-2 text-sm list-disc list-inside flex-grow">
+                        <li>경제 활성화 위한 오프라인 카지노(IR) 허용</li>
+                        <li>모든 형태의 온라인 도박은 엄격히 금지</li>
+                        <li>금지에도 불구, 세계 3위권의 불법 온라인 시장 형성</li>
+                        <li>법과 현실의 심각한 괴리 발생</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: The Core Choice Flowchart -->
+        <section class="mb-16 bg-white rounded-lg shadow-xl p-6 md:p-8">
+            <h2 class="text-3xl font-bold text-center text-[#004AAD] mb-2">정책의 갈림길: 피할 수 없는 선택</h2>
+             <p class="text-center max-w-3xl mx-auto text-gray-600 mb-8">
+                iGaming에 대한 수요는 현실입니다. 정책의 선택은 더 이상 '유무(有無)'가 아니라, 통제 가능한 합법 시장과 통제 불가능한 불법 시장 사이의 '선택'입니다.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
+                
+                <!-- Path A: Prohibition -->
+                <div class="w-full md:w-1/2 p-4 border-4 border-dashed border-red-400 rounded-lg bg-red-50">
+                    <h3 class="text-2xl font-bold text-red-600 text-center">경로 A: 현행 금지주의 유지</h3>
+                    <div class="mt-4 flex flex-col items-center space-y-4">
+                        <div class="bg-red-200 text-red-800 p-3 rounded-lg text-center w-full shadow"> 해외 서버 기반 불법 사업자 독점 </div>
+                        <div class="flow-arrow-down self-center"></div>
+                        <div class="bg-red-200 text-red-800 p-3 rounded-lg text-center w-full shadow"> 막대한 세수 유출 </div>
+                        <div class="flow-arrow-down self-center"></div>
+                        <div class="bg-red-200 text-red-800 p-3 rounded-lg text-center w-full shadow"> 소비자 보호 장치 전무 </div>
+                        <div class="flow-arrow-down self-center"></div>
+                         <div class="bg-red-200 text-red-800 p-3 rounded-lg text-center w-full shadow"> 범죄 조직의 수익원 전락 </div>
+                        <div class="flow-arrow-down self-center"></div>
+                        <div class="bg-red-600 text-white p-4 rounded-lg text-center w-full shadow-lg font-bold"> 결과: 103조 원 규모의 통제 불능 암시장 </div>
+                    </div>
+                </div>
+
+                <!-- Path B: Regulation -->
+                <div class="w-full md:w-1/2 p-4 border-4 border-dashed border-blue-400 rounded-lg bg-blue-50">
+                     <h3 class="text-2xl font-bold text-blue-600 text-center">경로 B: 규제를 통한 관리</h3>
+                     <div class="mt-4 flex flex-col items-center space-y-4">
+                        <div class="bg-blue-200 text-blue-800 p-3 rounded-lg text-center w-full shadow"> 면허 기반의 국내 합법 사업자 </div>
+                        <div class="flow-arrow-down self-center"></div>
+                        <div class="bg-blue-200 text-blue-800 p-3 rounded-lg text-center w-full shadow"> 안정적인 세수 확보 및 재원 활용 </div>
+                        <div class="flow-arrow-down self-center"></div>
+                        <div class="bg-blue-200 text-blue-800 p-3 rounded-lg text-center w-full shadow"> 책임감 있는 게임(RG) 정책 의무화 </div>
+                        <div class="flow-arrow-down self-center"></div>
+                        <div class="bg-blue-200 text-blue-800 p-3 rounded-lg text-center w-full shadow"> 이용자 보호 및 분쟁 해결 가능 </div>
+                        <div class="flow-arrow-down self-center"></div>
+                        <div class="bg-blue-600 text-white p-4 rounded-lg text-center w-full shadow-lg font-bold"> 결과: 관리 가능한 합법적 산업 생태계 </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 5: Building a Modern Framework -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-center text-[#004AAD] mb-2">미래를 위한 설계: 성공적인 규제 프레임워크의 핵심 요소</h2>
+             <p class="text-center max-w-3xl mx-auto text-gray-600 mb-8">
+                성공적인 iGaming 합법화는 단순히 문을 여는 것이 아니라, 글로벌 모범 사례를 바탕으로 정교하고 지속 가능한 시스템을 구축하는 것입니다.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+                    <div class="text-5xl mb-3">🛡️</div>
+                    <h4 class="text-xl font-bold text-[#004AAD]">이용자 보호 중심 설계</h4>
+                    <p class="text-sm mt-2 text-gray-600">영국 모델처럼 증거 기반의 강력한 책임감 있는 게임(RG) 도구(자가 제외, 예치금 한도 등)를 법제화 초기부터 도입해야 합니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+                    <div class="text-5xl mb-3">📢</div>
+                    <h4 class="text-xl font-bold text-[#004AAD]">선제적 광고 규제</h4>
+                    <p class="text-sm mt-2 text-gray-600">유럽의 추세에 따라, 시장 초기부터 광고 시간, 내용, 채널을 엄격히 규제하여 사회적 부작용과 대중적 반발을 최소화해야 합니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+                    <div class="text-5xl mb-3">💰</div>
+                    <h4 class="text-xl font-bold text-[#004AAD]">사회적 비용 책임</h4>
+                    <p class="text-sm mt-2 text-gray-600">세수의 일정 비율을 도박 중독 예방, 치료, 연구를 위한 기금으로 의무 배정하여 사회적 비용에 대한 책임을 다해야 합니다.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+                    <div class="text-5xl mb-3">🏛️</div>
+                    <h4 class="text-xl font-bold text-[#004AAD]">강력한 규제 기관</h4>
+                    <p class="text-sm mt-2 text-gray-600">독립적이고 충분한 예산과 권한을 가진 규제 기관을 설립하여 시장을 효과적으로 감독하고 규정을 집행해야 합니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: AI Policy Simulation -->
+        <section class="mb-16 bg-white rounded-lg shadow-xl p-6 md:p-8 text-center">
+            <h2 class="text-3xl font-bold text-center text-[#004AAD] mb-2">AI 기반 정책 시뮬레이션</h2>
+            <p class="text-center max-w-3xl mx-auto text-gray-600 mb-8">
+                글로벌 규제 모델의 장점을 결합하여 대한민국에 적용 가능한 하이브리드 모델의 개요를 AI를 통해 생성해 보세요.
+            </p>
+            <button id="simulatePolicyBtn" class="bg-gradient-to-r from-[#0086E5] to-[#004AAD] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:scale-105 transform transition-transform duration-300">
+                ✨ AI 규제 모델 시뮬레이션
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#004AAD] text-white text-center py-8 px-4 mt-8">
+        <p class="text-lg font-bold">선택은 '만약(IF)'이 아니라, '어떻게(HOW)'의 문제입니다.</p>
+        <p class="mt-2 text-sm text-[#A9D8FF]">통제 가능한 국내 시장을 통해 국민을 보호하고 세수를 확보할 것인가, 아니면 통제 불가능한 해외 불법 시장에 방치할 것인가.</p>
+        <button id="summarizeReportBtn" class="mt-6 bg-white text-[#004AAD] font-bold py-2 px-6 rounded-full shadow-md hover:bg-gray-200 transform transition-colors duration-300">
+            ✨ 이 보고서 요약하기
+        </button>
+    </footer>
+
+    <!-- Modal -->
+    <div id="modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <span id="modalCloseBtn" class="modal-close-btn">&times;</span>
+            <h3 id="modalTitle" class="text-2xl font-bold text-[#004AAD] mb-4"></h3>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const brilliantBlues = {
+            deepBlue: '#004AAD',
+            brightBlue: '#0086E5',
+            lightBlue: '#43B3FF',
+            veryLightBlue: '#A9D8FF',
+            white: '#FFFFFF',
+            nearBlack: '#212529'
+        };
+
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: brilliantBlues.nearBlack,
+                        font: {
+                            family: "'Noto Sans KR', sans-serif",
+                            weight: 'bold'
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: { 
+                        color: brilliantBlues.nearBlack,
+                        font: { family: "'Noto Sans KR', sans-serif" }
+                    },
+                    grid: { color: '#e0e0e0' }
+                },
+                x: {
+                    ticks: { 
+                        color: brilliantBlues.nearBlack,
+                        font: { family: "'Noto Sans KR', sans-serif" }
+                     },
+                    grid: { display: false }
+                }
+            }
+        };
+
+        function wrapLabel(str, maxWidth) {
+            if (str.length <= maxWidth) return str;
+            const words = str.split(' ');
+            let lines = [];
+            let currentLine = words[0];
+            for (let i = 1; i < words.length; i++) {
+                if (currentLine.length + words[i].length + 1 < maxWidth) {
+                    currentLine += ' ' + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        // Chart 1: Market Comparison
+        const marketComparisonCtx = document.getElementById('marketComparisonChart').getContext('2d');
+        new Chart(marketComparisonCtx, {
+            type: 'bar',
+            data: {
+                labels: ['합법 시장 (스포츠토토)', '불법 시장 (추정)'],
+                datasets: [{
+                    label: '시장 규모 (조 원)',
+                    data: [5.1, 103],
+                    backgroundColor: [brilliantBlues.lightBlue, brilliantBlues.deepBlue],
+                    borderColor: [brilliantBlues.brightBlue, brilliantBlues.deepBlue],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                ...defaultChartOptions,
+                indexAxis: 'y',
+                plugins: { ...defaultChartOptions.plugins, legend: { display: false } }
+            }
+        });
+
+        // Chart 2: Global Market Growth
+        const globalMarketGrowthCtx = document.getElementById('globalMarketGrowthChart').getContext('2d');
+        new Chart(globalMarketGrowthCtx, {
+            type: 'line',
+            data: {
+                labels: ['2023', '2025', '2027', '2029', '2031'],
+                datasets: [{
+                    label: '시장 규모 (억 달러)',
+                    data: [856, 1050, 1256, 1580, 1951],
+                    fill: true,
+                    backgroundColor: 'rgba(0, 134, 229, 0.2)',
+                    borderColor: brilliantBlues.brightBlue,
+                    tension: 0.3,
+                    pointBackgroundColor: brilliantBlues.deepBlue,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                ...defaultChartOptions,
+                plugins: { ...defaultChartOptions.plugins, legend: { display: true, position: 'bottom' } }
+            }
+        });
+
+        // Chart 3: Ecosystem Donut Chart
+        const ecosystemDonutCtx = document.getElementById('ecosystemDonutChart').getContext('2d');
+        new Chart(ecosystemDonutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['스포츠 베팅', '온라인 카지노', '포커', 'e스포츠 베팅', '기타(복권 등)'],
+                datasets: [{
+                    label: 'iGaming 분야',
+                    data: [45, 30, 10, 8, 7],
+                    backgroundColor: [
+                        brilliantBlues.deepBlue,
+                        brilliantBlues.brightBlue,
+                        brilliantBlues.lightBlue,
+                        '#87CEEB',
+                        brilliantBlues.veryLightBlue
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                 ...defaultChartOptions,
+                 plugins: { ...defaultChartOptions.plugins, legend: { position: 'bottom' } }
+            }
+        });
+
+        // Gemini API Integration
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const simulatePolicyBtn = document.getElementById('simulatePolicyBtn');
+        const summarizeReportBtn = document.getElementById('summarizeReportBtn');
+
+        function showModal(title, content) {
+            modalTitle.innerText = title;
+            modalBody.innerHTML = content;
+            modal.classList.remove('hidden');
+        }
+
+        function showLoadingModal(title) {
+            showModal(title, '<div class="loader"></div><p class="text-center text-gray-600">AI가 응답을 생성하고 있습니다. 잠시만 기다려주세요...</p>');
+        }
+
+        function hideModal() {
+            modal.classList.add('hidden');
+        }
+
+        modalCloseBtn.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+
+        async function callGeminiAPI(prompt) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API 요청 실패: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.error('Unexpected API response structure:', result);
+                    return '오류: AI로부터 유효한 응답을 받지 못했습니다. 응답 구조를 확인해주세요.';
+                }
+            } catch (error) {
+                console.error('Gemini API 호출 중 오류 발생:', error);
+                return `오류가 발생했습니다: ${error.message}. 인터넷 연결을 확인하거나 나중에 다시 시도해주세요.`;
+            }
+        }
+
+        simulatePolicyBtn.addEventListener('click', async () => {
+            showLoadingModal('AI 규제 모델 시뮬레이션');
+            const prompt = `당신은 iGaming 정책 분석 전문가입니다. 대한민국의 iGaming 합법화를 위한 새로운 규제 모델의 개요를 작성해주세요. 이 모델은 영국의 강력한 '소비자 보호' 중심 접근 방식과 몰타의 '사업 친화적' 환경의 장점을 결합해야 합니다. 다음 핵심 요소를 포함하여 구체적인 정책 제안을 서술형으로 설명해주세요: 1. 독립 규제 기관의 역할과 권한 2. 라이선스 종류 및 발급 조건 3. 과세 모델 및 세수 활용 방안 4. 책임감 있는 게임(RG) 및 이용자 보호 장치 5. 광고 및 마케팅 규제.`;
+            const result = await callGeminiAPI(prompt);
+            showModal('AI 규제 모델 시뮬레이션 결과', result.replace(/\n/g, '<br>'));
+        });
+
+        summarizeReportBtn.addEventListener('click', async () => {
+            showLoadingModal('보고서 요약');
+            const prompt = `당신은 정책 분석가입니다. 다음 인포그래픽의 핵심 내용을 요약해주세요. 1. 한국의 불법 iGaming 시장 규모(103조 원)와 합법 시장과의 현격한 차이. 2. 청소년 도박 문제의 심각성. 3. 글로벌 iGaming 시장의 성장세. 4. 영국, 몰타, 미국, 일본의 규제 모델 특징 비교. 5. 금지주의 유지와 규제 도입의 결과 차이. 6. 성공적 규제를 위한 4가지 핵심 요소(이용자 보호, 광고 규제, 사회적 비용 책임, 강력한 규제 기관). 이 내용들을 바탕으로 전체적인 상황과 정책적 시사점을 명확하게 요약해주세요.`;
+            const result = await callGeminiAPI(prompt);
+            showModal('보고서 요약', result.replace(/\n/g, '<br>'));
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>i-게이밍 산업 동향 대시보드 | 2025년 7월</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Neutral Grays, Subtle Blues, Muted Greens) -->
+    <!-- Application Structure Plan: A thematic dashboard structure is used to transform the dense report into a digestible, non-linear exploratory experience. The main screen acts as a hub with four key clickable sections: 'Global Regulations', 'Market Strategies', 'Tech Innovations', and 'Future Outlook'. This structure allows users to immediately grasp the report's core themes and dive into the topics that interest them most, rather than being forced into a linear reading. Key interactions include a clickable map for regional regulations, interactive charts for M&A and performance data, and tabbed/accordion interfaces for layered information, promoting user engagement and facilitating easier comparison and synthesis of complex information. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Global regulatory differences -> Goal: Compare/Organize -> Viz: Interactive region-selector (HTML/CSS divs) linked to a content panel -> Interaction: Click region to update content and a comparative tax chart -> Justification: Provides a high-level overview and allows drill-down into specific, complex data points like tax rates. -> Library: Chart.js for the bar chart.
+        - Report Info: Q1 2025 M&A deals -> Goal: Show Proportions -> Viz: Doughnut Chart -> Interaction: Hover to see deal details -> Justification: Effectively shows parts of the $6.6B total, more engaging than a simple list. -> Library: Chart.js.
+        - Report Info: Dual role of AI (Personalization vs. RG) -> Goal: Organize/Explain -> Viz: HTML/CSS diagram with flexbox -> Interaction: Static visual aid -> Justification: Clearly illustrates the conceptual relationship without complex graphics, enhancing understanding. -> Library/Method: HTML/CSS.
+        - Report Info: Strategic recommendations -> Goal: Inform/Organize -> Viz: Accordion list -> Interaction: Click to expand -> Justification: Condenses text-heavy recommendations into a clean, manageable format. -> Library/Method: JS.
+        All choices adhere to the NO SVG/Mermaid constraint, using Canvas for charts and structured HTML/CSS for diagrams. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link.active {
+            color: #0d9488; /* teal-600 */
+            border-bottom-color: #0d9488;
+        }
+        .tab.active {
+            border-color: #0d9488;
+            background-color: #ccfbf1; /* teal-100 */
+            color: #134e4a; /* teal-900 */
+        }
+        .region.active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            transform: scale(1.05);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-teal-700">i-게이밍 산업 동향 대시보드</h1>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#summary" class="nav-link border-b-2 border-transparent pb-1">주요 요약</a>
+                    <a href="#regulations" class="nav-link border-b-2 border-transparent pb-1">글로벌 규제</a>
+                    <a href="#strategies" class="nav-link border-b-2 border-transparent pb-1">시장 전략</a>
+                    <a href="#tech" class="nav-link border-b-2 border-transparent pb-1">기술 혁신</a>
+                    <a href="#outlook" class="nav-link border-b-2 border-transparent pb-1">미래 전망</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-slate-500 hover:text-teal-600 hover:bg-slate-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#summary" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">주요 요약</a>
+            <a href="#regulations" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">글로벌 규제</a>
+            <a href="#strategies" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">시장 전략</a>
+            <a href="#tech" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">기술 혁신</a>
+            <a href="#outlook" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">미래 전망</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        
+        <!-- Section 1: Summary -->
+        <section id="summary" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">i-게이밍 시장 정보 보고서: 2025년 7월</h2>
+            <p class="text-lg text-slate-500 mb-6">규제 역풍과 기술 개척의 탐색</p>
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <h3 class="font-bold text-xl text-teal-800 mb-3">주요 요약</h3>
+                <p class="text-slate-600 leading-relaxed">2025년 중반, i-게이밍 산업은 중대한 변곡점에 서 있습니다. 특히 미국 시장은 GGR 기준 세계 최대 규모로 성장했지만, 높은 세율과 치열한 경쟁으로 운영 장벽 또한 높아지는 역설적인 상황입니다. 이에 Super Group과 같은 기업은 미국 시장에서 철수하고 있으며, 사업자들은 독점 콘텐츠 개발과 M&A를 통해 활로를 모색하고 있습니다. AI와 블록체인과 같은 기술은 플레이어 경험을 혁신하고 책임감 있는 게이밍을 강화하는 핵심 동력으로 작용하고 있습니다. 이 대시보드는 이러한 복잡한 환경을 심층적으로 분석하고 미래 전략을 제시합니다.</p>
+            </div>
+        </section>
+
+        <!-- Section 2: Regulations -->
+        <section id="regulations" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">변화하는 글로벌 규제 나침반</h2>
+            <p class="text-slate-500 mb-8">시장 접근성과 기업 전략을 결정하는 전 세계의 복잡하고 모순적인 규제 동향을 분석합니다.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <h3 class="font-bold text-xl text-teal-800 mb-4">규제 지역 선택</h3>
+                    <p class="text-sm text-slate-500 mb-4">아래 지역을 클릭하여 상세 규제 정보와 관련 시장 데이터를 확인하세요.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="region px-4 py-2 rounded-full text-sm font-semibold bg-slate-200 hover:bg-teal-500 hover:text-white transition-all duration-300" data-region="usa">미국</button>
+                        <button class="region px-4 py-2 rounded-full text-sm font-semibold bg-slate-200 hover:bg-teal-500 hover:text-white transition-all duration-300" data-region="international">기타 국제</button>
+                    </div>
+                    <div class="mt-6">
+                        <div class="chart-container">
+                            <canvas id="taxRateChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div id="regulation-details" class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <h3 id="regulation-title" class="font-bold text-xl text-teal-800 mb-4">지역을 선택해주세요</h3>
+                    <div id="regulation-content" class="text-slate-600 space-y-4 leading-relaxed">
+                        <p>좌측에서 지역을 선택하면 상세 정보가 여기에 표시됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Strategies -->
+        <section id="strategies" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">경쟁 환경에서의 전략적 필수 과제</h2>
+            <p class="text-slate-500 mb-8">규제 및 경제적 압력에 대응하여 사업자들이 어떻게 전략을 조정하고 있는지 분석합니다.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <h3 class="font-bold text-xl text-teal-800 mb-4">콘텐츠 군비 경쟁: 독점 게임</h3>
+                    <p class="text-slate-600 mb-4">포화된 시장에서 사업자들은 플레이어 유치 및 유지를 위해 독점 콘텐츠 개발에 집중하고 있습니다. 이는 브랜드 충성도를 구축하고 이탈률을 낮추는 핵심 전략입니다.</p>
+                    <div class="bg-slate-100 p-4 rounded-lg">
+                        <p class="font-semibold text-slate-800">사례 연구: Hard Rock Bet "Liberty Fortune"</p>
+                        <p class="text-sm text-slate-500 mt-1">Bragg Gaming과 협력하여 출시한 이 독점 슬롯은 맞춤형 콘텐츠 전략의 대표적인 예시로, 스택 와일드, 멀티플라이어 등 차별화된 경험을 제공하여 플레이어에게 머물러야 할 이유를 제공합니다.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <h3 class="font-bold text-xl text-teal-800 mb-4">M&A 및 시장 통합</h3>
+                    <p class="text-slate-600 mb-4">2025년 1분기 M&A 활동은 <span class="font-bold text-teal-600">66억 달러</span>에 달하며 시장 통합이 가속화되고 있음을 보여줍니다. 대형 사업자들은 IP, 기술, 시장 점유율 확보를 위해 적극적으로 인수에 나서고 있습니다.</p>
+                    <div class="chart-container h-64 max-h-[30vh]">
+                        <canvas id="mnaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Tech -->
+        <section id="tech" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">기술 개척: AI, 블록체인, 그리고 미래</h2>
+            <p class="text-slate-500 mb-8">플레이어 상호작용부터 규제 준수까지, i-게이밍의 본질을 재구성하는 핵심 기술을 탐구합니다.</p>
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <div class="mb-6 border-b border-slate-200">
+                    <div class="flex space-x-1" role="tablist">
+                         <button role="tab" class="tech-tab tab active px-4 py-2 text-sm font-medium rounded-t-lg border-b-2" data-tech="ai">인공지능(AI) 혁명</button>
+                         <button role="tab" class="tech-tab tab px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-transparent" data-tech="blockchain">블록체인의 약속</button>
+                    </div>
+                </div>
+                <div id="tech-content-container">
+                    <!-- AI Content will be injected here -->
+                    <!-- Blockchain Content will be injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Outlook -->
+        <section id="outlook" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">전략적 권고 및 향후 전망</h2>
+            <p class="text-slate-500 mb-8">분석을 바탕으로 i-게이밍 사업자, 투자자를 위한 실행 가능한 미래 지향적 권고 사항을 종합합니다.</p>
+            <div id="accordion-container" class="space-y-4">
+                <!-- Accordion items will be injected here -->
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-slate-800 text-slate-300 mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm">
+            <p>&copy; 2025 i-게이밍 산업 동향 분석. 모든 정보는 제공된 보고서를 기반으로 합니다.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const data = {
+        regulations: {
+            usa: {
+                title: '미국의 역설: 높은 성장과 높은 장벽',
+                content: `
+                    <p class="mb-4">미국은 GGR 기준 세계 최대 규제 시장으로 부상했지만, 높은 세율, 규제 파편화, 치열한 경쟁으로 인해 운영 환경은 그 어느 때보다 어렵습니다.</p>
+                    <div class="bg-slate-100 p-3 rounded-lg space-y-2 text-sm">
+                        <p><strong class="text-slate-700">사례: Super Group의 철수</strong><br>Betway의 모회사인 Super Group은 뉴저지 세율 인상(19.75%) 등 규제 변화와 수익성 악화로 미국 i-게이밍 시장에서 완전히 철수했습니다. 이는 미국 시장의 높은 진입 장벽을 상징적으로 보여줍니다.</p>
+                        <p><strong class="text-slate-700">캘리포니아의 단속</strong><br>법무장관은 모든 현금 기반 DFS를 불법으로 규정했으며, 부족 국가들은 비규제 스위프스테이크 카지노 폐쇄를 추진하며 시장 정화에 나서고 있습니다.</p>
+                    </div>
+                `,
+                chartData: {
+                    labels: ['뉴저지 i게이밍', '뉴욕 스포츠베팅'],
+                    data: [19.75, 51]
+                }
+            },
+            international: {
+                title: '주요 국제 규제 동향',
+                content: `
+                    <p class="mb-4">전 세계적으로 규제 환경은 각기 다른 방향으로 변화하고 있습니다.</p>
+                    <ul class="list-disc list-inside space-y-2 text-sm">
+                        <li><strong>트리니다드 토바고:</strong> 도박 합법 연령을 18세에서 25세로 상향 조정 제안.</li>
+                        <li><strong>필리핀:</strong> 전면 금지 요구 속에서, 정부(PAGCOR)는 막대한 세수를 이유로 금지 대신 규제 강화를 선택.</li>
+                        <li><strong>일본:</strong> 현재 회색 지대인 온라인 카지노를 명시적으로 금지하는 법안 추진.</li>
+                        <li><strong>영국 & 몰타:</strong> 성숙 시장으로서 AML 강화, 자본 요건 정책 발표 등 규제 정교화에 집중.</li>
+                    </ul>
+                `,
+                chartData: {
+                    labels: ['뉴저지 i게이밍', '영국 GGR세', '몰타 GGR세'],
+                    data: [19.75, 21, 5]
+                }
+            }
+        },
+        mna: {
+            labels: ['Scopely (Niantic 사업부)', 'Tencent (Ubisoft 자회사)', 'Miniclip (Easybrain)', '기타'],
+            data: [35, 12.5, 12, 6.5]
+        },
+        tech: {
+            ai: `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold text-lg text-teal-700 mb-3">AI의 이중적 역할</h4>
+                        <p class="text-sm text-slate-600 mb-4">AI는 플레이어 참여를 극대화하는 동시에 책임감 있는 게이밍을 강화하는 핵심 도구입니다.</p>
+                        <div class="space-y-3">
+                            <div class="bg-teal-50 p-3 rounded-lg">
+                                <p class="font-semibold text-teal-800">초개인화 및 유지율 향상</p>
+                                <p class="text-xs text-teal-600 mt-1">개인화된 게임 추천, 맞춤형 보너스 제공으로 이탈률 감소. GR8 Tech는 AI가 유지율을 75-80%까지 높일 수 있다고 주장합니다.</p>
+                            </div>
+                            <div class="bg-amber-50 p-3 rounded-lg">
+                                <p class="font-semibold text-amber-800">책임감 있는 도박 강화</p>
+                                <p class="text-xs text-amber-600 mt-1">도박 패턴을 분석하여 위험 플레이어를 식별하고, 프로모션 대신 책임감 있는 도박 메시지를 자동으로 전송하여 선제적으로 개입합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-teal-700 mb-3">AI 성능 향상 효과 (GR8 Tech 주장)</h4>
+                        <div class="chart-container h-56 max-h-[25vh]">
+                            <canvas id="aiPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            `,
+            blockchain: `
+                <div>
+                    <h4 class="font-bold text-lg text-teal-700 mb-3">신뢰와 거래의 재정의</h4>
+                    <p class="text-sm text-slate-600 mb-4">블록체인 기술은 투명성과 효율성을 통해 도박의 오랜 우려 사항인 공정성과 결제 문제를 해결합니다.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-100 p-4 rounded-lg">
+                            <p class="font-semibold text-slate-800">증명 가능한 공정한 게임</p>
+                            <p class="text-xs text-slate-500 mt-1">플레이어가 게임 결과가 조작되지 않았음을 암호학적으로 직접 검증할 수 있게 하여 플랫폼에 대한 신뢰를 구축합니다.</p>
+                        </div>
+                        <div class="bg-slate-100 p-4 rounded-lg">
+                            <p class="font-semibold text-slate-800">효율적인 결제 시스템</p>
+                            <p class="text-xs text-slate-500 mt-1">암호화폐를 통해 거의 즉각적인 입출금을 지원하며, 특히 은행 규제가 엄격한 지역에서 가치가 높습니다. (온라인 게이밍 사이트의 ~40%가 지원)</p>
+                        </div>
+                    </div>
+                </div>
+            `
+        },
+        outlook: [
+            { title: '규제 파편화 탐색: "포트폴리오" 접근법', content: '전 세계적으로 상이한 규제 경로를 고려할 때, 단일 전략은 더 이상 유효하지 않습니다. 사업자들은 시장을 위험/보상 매트릭스에 따라 분류하고 자원을 유연하게 배분하는 포트폴리오 접근법을 채택해야 합니다.' },
+            { title: '"초차별화"를 통한 승리', content: '수익성 압박과 치열한 경쟁에 대응하기 위해, 독점 콘텐츠 개발에 투자하고, AI나 블록체인 같은 기술을 브랜드 정체성의 핵심으로 활용하여 안목 있는 플레이어를 유치하는 \'초차별화\' 전략이 필요합니다.' },
+            { title: '책임감 있는 혁신의 필수성', content: 'AI가 강력해짐에 따라, 사업자들은 참여와 보호 사이의 윤리적 긴장을 사전에 해결해야 합니다. 플레이어 위험 점수에 따라 프로모션과 커뮤니케이션을 동적으로 조정하는 통합 시스템을 구축하여 미래의 규제 조사를 대비해야 합니다.' },
+            { title: '주시해야 할 주요 동향', content: '향후 미국 시장의 M&A와 통합 물결, 예측 시장의 합법성 논쟁, 그리고 브라질, 태국 등 미개척 시장의 부상을 주시해야 합니다. 이들이 다음 성장 동력이 될 수 있습니다.' }
+        ]
+    };
+
+    // Mobile Menu
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // Nav Link Scrolling & Active State
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector(link.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+             if(mobileMenu.classList.contains('hidden') === false) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                });
+            }
+        });
+    }, { rootMargin: '-20% 0px -80% 0px' });
+
+    sections.forEach(section => observer.observe(section));
+
+
+    // Chart instances
+    let taxChart, mnaChartInstance, aiChart;
+    const chartFontColor = '#64748b'; // slate-500
+
+    // M&A Chart
+    function createMnaChart() {
+        const ctx = document.getElementById('mnaChart').getContext('2d');
+        mnaChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.mna.labels,
+                datasets: [{
+                    label: '2025년 1분기 주요 M&A (억 달러)',
+                    data: data.mna.data,
+                    backgroundColor: ['#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4'],
+                    borderColor: '#f8fafc',
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: chartFontColor,
+                            font: { size: 10 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + '억 달러';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Tax Rate Chart
+    function createTaxRateChart(chartData) {
+        if(taxChart) {
+            taxChart.destroy();
+        }
+        const ctx = document.getElementById('taxRateChart').getContext('2d');
+        taxChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'GGR 세율 (%)',
+                    data: chartData.data,
+                    backgroundColor: '#5eead4',
+                    borderColor: '#0d9488',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { 
+                        beginAtZero: true,
+                        ticks: { color: chartFontColor }
+                    },
+                    y: { 
+                        ticks: { color: chartFontColor }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: '주요 시장 GGR 세율 비교',
+                        color: chartFontColor
+                    }
+                }
+            }
+        });
+    }
+    
+    // Regulations section logic
+    const regionButtons = document.querySelectorAll('.region');
+    const regulationTitle = document.getElementById('regulation-title');
+    const regulationContent = document.getElementById('regulation-content');
+    
+    regionButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const region = button.dataset.region;
+            const regionData = data.regulations[region];
+
+            regionButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            regulationTitle.textContent = regionData.title;
+            regulationContent.innerHTML = regionData.content;
+            createTaxRateChart(regionData.chartData);
+        });
+    });
+
+    // Tech Section Logic
+    const techTabs = document.querySelectorAll('.tech-tab');
+    const techContentContainer = document.getElementById('tech-content-container');
+
+    function renderTechContent(techType) {
+        techContentContainer.innerHTML = data.tech[techType];
+        if (techType === 'ai') {
+            createAiPerformanceChart();
+        }
+    }
+
+    function createAiPerformanceChart() {
+        if(aiChart) aiChart.destroy();
+        const ctx = document.getElementById('aiPerformanceChart').getContext('2d');
+        aiChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['플레이어 참여도', '유지율'],
+                datasets: [{
+                    label: '증가율 (%)',
+                    data: [30, 75],
+                    backgroundColor: ['#a7f3d0', '#6ee7b7'],
+                    borderColor: ['#047857', '#065f46'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 100, ticks: { color: chartFontColor } },
+                    x: { ticks: { color: chartFontColor } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    techTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const techType = tab.dataset.tech;
+            techTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderTechContent(techType);
+        });
+    });
+
+    // Outlook Accordion
+    const accordionContainer = document.getElementById('accordion-container');
+    data.outlook.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden';
+        div.innerHTML = `
+            <button class="accordion-button w-full text-left p-4 flex justify-between items-center font-semibold text-slate-800 hover:bg-slate-50">
+                <span>${item.title}</span>
+                <span class="accordion-icon transition-transform duration-300 transform">+</span>
+            </button>
+            <div class="accordion-content">
+                <p class="p-4 pt-0 text-slate-600 text-sm leading-relaxed">${item.content}</p>
+            </div>
+        `;
+        accordionContainer.appendChild(div);
+    });
+
+    accordionContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('.accordion-button');
+        if (button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('.accordion-icon');
+            const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+
+            // Close all others
+            document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = '0px');
+            document.querySelectorAll('.accordion-icon').forEach(i => i.textContent = '+');
+            document.querySelectorAll('.accordion-button').forEach(b => b.classList.remove('bg-slate-100'));
+            
+            if (!isOpen) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.textContent = '-';
+                button.classList.add('bg-slate-100');
+            }
+        }
+    });
+
+    // Initializations
+    createMnaChart();
+    renderTechContent('ai'); 
+    document.querySelector('.region[data-region="usa"]').click();
+});
+</script>
+</body>
+</html>

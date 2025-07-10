@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미국 iGaming의 역설: 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A non-linear, dashboard-style SPA designed to answer the core question: 'Why did Super Group leave the US?'. It guides the user through the key barriers (Regulation, Tax, Competition, Cost) via interactive components like a clickable map and comparative charts, culminating in a logical explanation of the case study. This structure prioritizes exploratory learning over linear reading, making complex market dynamics more digestible. -->
+    <!-- Visualization & Content Choices: 1. **US Legal Map**: Report Info -> Fragmented state legalization. Goal -> Organize/Inform. Viz -> HTML/CSS Grid-based map (NO SVG). Interaction -> Click a state 'div' to show details in a panel. Justification -> Visually demonstrates the 'island market' problem. 2. **Tax/License Fee Charts**: Report Info -> High/variable state taxes & fees. Goal -> Compare. Viz -> Chart.js Bar Chart. Interaction -> Hover tooltips. Justification -> Quantifies the extreme financial barriers in key states like PA. 3. **Market Share Diagram**: Report Info -> Market dominance by FanDuel/DraftKings. Goal -> Compare/Inform. Viz -> Proportional HTML/CSS divs. Interaction -> Hover for details. Justification -> Shows the 'winner-take-all' competitive landscape. 4. **Decision Flowchart**: Report Info -> Super Group's rationale. Goal -> Explain. Viz -> HTML/CSS flowchart. Interaction -> Static. Justification -> Simplifies a complex business decision into a clear, logical sequence. All visualizations use Canvas (via Chart.js) or standard HTML/CSS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f7f4;
+            color: #3d3d3d;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #4a5568;
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 4px;
+        }
+        .state {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .state:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        .state-legal { background-color: #68d391; color: #1a202c; }
+        .state-poker { background-color: #63b3ed; color: #1a202c; }
+        .state-sports { background-color: #f6e05e; color: #1a202c; }
+        .state-illegal { background-color: #e2e8f0; color: #4a5568; }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-5xl font-bold text-gray-800 mb-2">미국 iGaming의 역설</h1>
+            <p class="text-lg md:text-xl text-gray-600">고성장, 고진입장벽 시장에서 슈퍼그룹은 왜 철수를 선택했나?</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 md:mb-12">
+            <button class="nav-button px-4 py-2 rounded-full bg-white shadow-sm hover:bg-gray-200" data-target="intro">도입</button>
+            <button class="nav-button px-4 py-2 rounded-full bg-white shadow-sm hover:bg-gray-200" data-target="barriers">핵심 진입장벽</button>
+            <button class="nav-button px-4 py-2 rounded-full bg-white shadow-sm hover:bg-gray-200" data-target="case-study">사례: 슈퍼그룹</button>
+            <button class="nav-button px-4 py-2 rounded-full bg-white shadow-sm hover:bg-gray-200" data-target="conclusion">결론</button>
+        </nav>
+
+        <main>
+            <section id="intro" class="content-section active fade-in">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">성장하는 시장, 그러나 떠나는 기업들</h2>
+                    <p class="text-gray-600 mb-4">
+                        미국 iGaming(온라인 카지노) 시장은 폭발적인 성장세를 보이고 있습니다. 하지만 글로벌 유력 기업인 슈퍼그룹(Super Group)은 기록적인 글로벌 실적에도 불구하고 미국 시장 철수라는 충격적인 결정을 내렸습니다. 이 결정은 회사의 재정 문제가 아닌, 미국 시장의 복잡하고 비합리적인 구조에 대한 전략적 대응입니다.
+                    </p>
+                    <p class="text-gray-600">
+                        이 대시보드는 슈퍼그룹의 사례를 통해 미국 iGaming 시장의 이면을 탐구합니다. 파편화된 규제, 과도한 세금, 극심한 경쟁 등 기업들이 마주하는 현실적인 장벽들을 데이터와 함께 살펴보며 '왜' 그들이 떠날 수밖에 없었는지 분석합니다.
+                    </p>
+                </div>
+            </section>
+
+            <section id="barriers" class="content-section fade-in">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold mb-2 text-gray-700">지속 불가능하게 만드는 4대 장벽</h2>
+                    <p class="text-gray-600">미국 iGaming 시장의 수익성을 저해하는 핵심 요인들입니다.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="font-bold text-xl mb-3 text-indigo-600">1. 규제의 미로: 파편화된 시장</h3>
+                        <p class="text-sm text-gray-600 mb-4">미국은 단일 시장이 아닙니다. 주(State)마다 다른 법률과 규제로 인해 사업자는 각 주를 별개의 국가처럼 공략해야 합니다. 아래 지도에서 주를 클릭하여 합법화 현황을 확인해보세요.</p>
+                        <div class="map-grid mb-4">
+                            <!-- Placeholder divs for map layout -->
+                            <div class="col-start-1 col-span-1"></div>
+                            <div class="state state-sports" data-state="WA">WA</div>
+                            <div class="state state-sports" data-state="MT">MT</div>
+                            <div class="state state-sports" data-state="ND">ND</div>
+                            <div class="state state-illegal" data-state="MN">MN</div>
+                            <div class="state state-illegal" data-state="WI">WI</div>
+                            <div class="state state-legal" data-state="MI">MI</div>
+                            <div class="col-span-2"></div>
+                            <div class="state state-sports" data-state="VT">VT</div>
+                            <div class="state state-sports" data-state="NH">NH</div>
+                            <div class="state state-sports" data-state="ME">ME</div>
+
+                            <div class="state state-sports" data-state="OR">OR</div>
+                            <div class="state state-illegal" data-state="ID">ID</div>
+                            <div class="state state-sports" data-state="WY">WY</div>
+                            <div class="state state-sports" data-state="SD">SD</div>
+                            <div class="state state-sports" data-state="IA">IA</div>
+                            <div class="state state-sports" data-state="IL">IL</div>
+                            <div class="state state-sports" data-state="IN">IN</div>
+                            <div class="state state-sports" data-state="OH">OH</div>
+                            <div class="state state-legal" data-state="WV">WV</div>
+                            <div class="state state-sports" data-state="NY">NY</div>
+                            <div class="state state-sports" data-state="MA">MA</div>
+                            <div class="state state-legal" data-state="RI">RI</div>
+
+                            <div class="state state-illegal" data-state="CA">CA</div>
+                            <div class="state state-poker" data-state="NV">NV</div>
+                            <div class="state state-illegal" data-state="UT">UT</div>
+                            <div class="state state-sports" data-state="CO">CO</div>
+                            <div class="state state-sports" data-state="NE">NE</div>
+                            <div class="state state-sports" data-state="KS">KS</div>
+                            <div class="state state-illegal" data-state="MO">MO</div>
+                            <div class="state state-sports" data-state="KY">KY</div>
+                            <div class="state state-legal" data-state="PA">PA</div>
+                            <div class="state state-legal" data-state="NJ">NJ</div>
+                            <div class="state state-legal" data-state="CT">CT</div>
+                            <div class="state state-legal" data-state="DE">DE</div>
+                            
+                            <div class="col-start-4 col-span-1"></div>
+                            <div class="state state-sports" data-state="AZ">AZ</div>
+                            <div class="state state-sports" data-state="NM">NM</div>
+                            <div class="state state-illegal" data-state="OK">OK</div>
+                            <div class="state state-sports" data-state="AR">AR</div>
+                            <div class="state state-sports" data-state="TN">TN</div>
+                            <div class="state state-sports" data-state="VA">VA</div>
+                            <div class="state state-sports" data-state="MD">MD</div>
+                            <div class="state state-sports" data-state="DC">DC</div>
+                            
+                            <div class="col-start-5 col-span-1"></div>
+                            <div class="state state-illegal" data-state="TX">TX</div>
+                            <div class="state state-sports" data-state="LA">LA</div>
+                            <div class="state state-sports" data-state="MS">MS</div>
+                            <div class="state state-illegal" data-state="AL">AL</div>
+                            <div class="state state-illegal" data-state="GA">GA</div>
+                            <div class="state state-sports" data-state="SC">SC</div>
+                            <div class="state state-sports" data-state="NC">NC</div>
+                             
+                            <div class="col-start-7 col-span-1"></div>
+                            <div class="state state-illegal" data-state="FL">FL</div>
+                        </div>
+                        <div id="state-info" class="p-4 bg-gray-100 rounded-lg min-h-[120px]">
+                            <p class="text-center text-gray-500">주를 선택하여 상세 정보를 확인하세요.</p>
+                        </div>
+                         <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-green-400 mr-2"></span>iGaming 전체 합법</span>
+                            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-400 mr-2"></span>포커만 합법</span>
+                            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-300 mr-2"></span>스포츠 베팅만 합법</span>
+                            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-gray-300 mr-2"></span>불법</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="font-bold text-xl mb-3 text-red-600">2. 세금과 비용: 수익성 압박</h3>
+                        <p class="text-sm text-gray-600 mb-4">높은 세율과 천문학적인 라이선스 비용은 수익 마진을 심각하게 잠식합니다. 특히 펜실베이니아의 54% 슬롯세는 사업을 거의 불가능하게 만듭니다.</p>
+                        <div class="chart-container">
+                            <canvas id="taxChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-gray-500 mt-2">주요 3개 주 iGaming 세율 비교 (GGR 기준)</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="font-bold text-xl mb-3 text-yellow-600">3. 출혈 경쟁: 거인들의 전쟁터</h3>
+                        <p class="text-sm text-gray-600 mb-4">시장은 FanDuel, DraftKings 같은 소수의 거대 기업이 지배합니다. 이들은 막대한 마케팅 비용으로 시장을 장악하며, 중소 사업자는 고객 한 명을 확보하는 데 1,400달러까지 지출해야 합니다.</p>
+                        <div class="space-y-3">
+                            <div class="w-full bg-gray-200 rounded-full h-8">
+                                <div class="bg-blue-500 h-8 rounded-full flex items-center justify-center text-white font-bold" style="width: 75%">FanDuel & DraftKings (75%)</div>
+                            </div>
+                             <div class="w-full bg-gray-200 rounded-full h-8">
+                                <div class="bg-green-500 h-8 rounded-full flex items-center justify-center text-white font-bold" style="width: 15%">BetMGM (15%)</div>
+                            </div>
+                             <div class="w-full bg-gray-200 rounded-full h-8">
+                                <div class="bg-gray-400 h-8 rounded-full flex items-center justify-center text-white font-bold" style="width: 10%">기타 (10%)</div>
+                            </div>
+                        </div>
+                         <p class="text-xs text-center text-gray-500 mt-2">미국 온라인 스포츠 베팅 시장 점유율 (추정치)</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="font-bold text-xl mb-3 text-purple-600">4. 높은 진입 비용</h3>
+                        <p class="text-sm text-gray-600 mb-4">시장에 진입하는 것만으로도 막대한 자본이 필요합니다. 펜실베이니아는 라이선스 비용만 1,000만 달러에 달합니다.</p>
+                         <div class="chart-container">
+                            <canvas id="licenseFeeChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-gray-500 mt-2">주요 3개 주 초기 라이선스 비용 비교</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="case-study" class="content-section fade-in">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">사례 연구: 슈퍼그룹의 계산된 철수</h2>
+                    <p class="text-gray-600 mb-6">
+                        슈퍼그룹의 미국 시장 철수는 실패가 아닌, 데이터에 기반한 합리적인 '자본 재배치' 결정이었습니다. 회사는 미국 시장의 높은 장벽들이 자사의 엄격한 '자본 수익률 기준'을 충족시키지 못할 것이라고 판단했습니다. 아래는 그들의 의사결정 과정을 도식화한 것입니다.
+                    </p>
+                    <div class="border-l-2 border-indigo-200 pl-6 space-y-8 relative">
+                        <div class="absolute w-4 h-4 rounded-full bg-indigo-500 -left-2 top-1"></div>
+                        <div>
+                            <h4 class="font-bold text-lg text-indigo-700">1. 시장 평가</h4>
+                            <p class="text-gray-600">미국 시장의 잠재적 성장성 vs 현실적 진입장벽 분석</p>
+                            <div class="mt-2 p-3 bg-gray-50 rounded-lg text-sm">
+                                <span class="font-semibold">결과:</span> 높은 잠재력에도 불구하고, 파편화된 규제와 높은 비용으로 인해 '섬 시장(island market)'의 집합체로 판단. 규모의 경제 실현 불가.
+                            </div>
+                        </div>
+                        <div class="absolute w-4 h-4 rounded-full bg-indigo-500 -left-2 top-1/3"></div>
+                        <div>
+                            <h4 class="font-bold text-lg text-indigo-700">2. 경제성 분석 (ROI)</h4>
+                            <p class="text-gray-600">높은 세율(PA 54%) + 높은 고객 확보 비용(CAC) + 높은 운영 비용을 감안한 예상 투자수익률 계산.</p>
+                            <div class="mt-2 p-3 bg-gray-50 rounded-lg text-sm">
+                                <span class="font-semibold">결과:</span> '수익성 바이스(profitability vise)'. 수익 창출까지의 경로가 불가능할 정도로 길고, 단기 및 중기적 ROI가 회사 기준에 미달.
+                            </div>
+                        </div>
+                        <div class="absolute w-4 h-4 rounded-full bg-indigo-500 -left-2 top-2/3"></div>
+                        <div>
+                            <h4 class="font-bold text-lg text-indigo-700">3. 경쟁 환경 분석</h4>
+                            <p class="text-gray-600">FanDuel, DraftKings 등 거대 자본과의 경쟁에서 승리 가능성 평가.</p>
+                            <div class="mt-2 p-3 bg-gray-50 rounded-lg text-sm">
+                                <span class="font-semibold">결과:</span> 시장 점유율 확보를 위한 출혈 경쟁은 비효율적. '중간 계층' 사업자로서 생존하기 어려운 '승자 독식' 구조 확인.
+                            </div>
+                        </div>
+                         <div class="absolute w-4 h-4 rounded-full bg-green-500 -left-2 bottom-1"></div>
+                        <div>
+                            <h4 class="font-bold text-lg text-green-700">4. 최종 전략 결정</h4>
+                            <p class="text-gray-600">제한된 자본을 어디에 집중할 것인가?</p>
+                            <div class="mt-2 p-3 bg-green-50 rounded-lg text-sm">
+                                <span class="font-semibold">결정:</span> 미국 시장 철수. 약 3-4천만 달러의 일회성 비용을 감수하고, 아프리카 등 더 높은 성장성과 수익성이 기대되는 시장에 자원 집중.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="conclusion" class="content-section fade-in">
+                 <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-700">결론: 크지만 얕은 시장의 미래</h2>
+                    <p class="text-gray-600 mb-4">
+                        슈퍼그룹의 사례는 미국 iGaming 시장이 중요한 변곡점에 서 있음을 보여줍니다. 총매출은 계속 성장하겠지만, 그 이면의 경제 구조는 소수의 거대 기업을 제외한 대부분의 사업자에게 지속 불가능합니다.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">사업자를 위한 시사점</h4>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li><b>거인의 길:</b> 막대한 투자로 시장 지배.</li>
+                                <li><b>틈새 전략:</b> 특정 주/분야에 집중.</li>
+                                <li><b>기술 중심:</b> 운영 비용 절감에 집중.</li>
+                                <li><b>출구 전략:</b> 과감한 철수 및 자원 재배치.</li>
+                            </ul>
+                        </div>
+                        <div>
+                             <h4 class="font-bold text-lg mb-2">정책 입안자를 위한 제언</h4>
+                            <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                <li>규제 조화(주 간 협약)를 통한 진입장벽 완화.</li>
+                                <li>경쟁 촉진을 위한 합리적인 세율 구조 설계.</li>
+                                <li>불법 블랙마켓으로의 이탈 방지책 마련.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-center text-gray-700 font-semibold bg-yellow-100 p-4 rounded-lg">
+                        결론적으로, 현재의 규제 및 세금 환경에 중대한 변화가 없다면, 미국은 소수 기업이 독점하고 완전한 잠재력을 실현하지 못하는 '크지만 얕은' 시장으로 남을 위험이 있습니다.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+            const stateElements = document.querySelectorAll('.state');
+            const stateInfoPanel = document.getElementById('state-info');
+
+            const stateData = {
+                'CT': { name: '코네티컷', status: 'iGaming 전체 합법', details: '2021년 말 시장 개시. 제한된 사업자 모델.' },
+                'DE': { name: '델라웨어', status: 'iGaming 전체 합법', details: '미국 최초 합법 주 중 하나. 주 복권국이 독점 운영.' },
+                'MI': { name: '미시간', status: 'iGaming 전체 합법', details: '상업 및 부족 카지노 모두 운영. 20-28%의 누진세.' },
+                'NJ': { name: '뉴저지', status: 'iGaming 전체 합법', details: '미국 최대 시장. 최근 세율을 19.75%로 인상.' },
+                'PA': { name: '펜실베이니아', status: 'iGaming 전체 합법', details: '온라인 슬롯에 54%라는 높은 세율 부과.' },
+                'RI': { name: '로드아일랜드', status: 'iGaming 전체 합법', details: '2024년 3월 시장 개시. 가장 최근 합법화 주.' },
+                'WV': { name: '웨스트버지니아', status: 'iGaming 전체 합법', details: '2019년 합법화. 상대적으로 작은 시장.' },
+                'NV': { name: '네바다', status: '포커만 합법', details: '온라인 포커만 허용. 온라인 카지노는 불법.' },
+                'WA': { name: '워싱턴', status: '스포츠 베팅만 합법', details: '부족 카지노 내에서만 제한적으로 허용.' },
+                'MT': { name: '몬태나', status: '스포츠 베팅만 합법', details: '주 복권국이 운영. 모바일 베팅은 제한적.' },
+                'ND': { name: '노스다코타', status: '스포츠 베팅만 합법', details: '자선 게이밍의 일부로 허용.' },
+                'OR': { name: '오리건', status: '스포츠 베팅만 합법', details: '주 복권국 독점.' },
+                'WY': { name: '와이오밍', status: '스포츠 베팅만 합법', details: '완전 온라인 모델.' },
+                'SD': { name: '사우스다코타', status: '스포츠 베팅만 합법', details: '데드우드 시의 카지노 내에서만 허용.' },
+                'IA': { name: '아이오와', status: '스포츠 베팅만 합법', details: 'iGaming 합법화 논의 있었으나 실패.' },
+                'IL': { name: '일리노이', status: '스포츠 베팅만 합법', details: 'iGaming 법안 반복적으로 실패. 최근 세금 인상.' },
+                'IN': { name: '인디애나', status: '스포츠 베팅만 합법', details: 'iGaming 합법화 2026년 이후로 연기.' },
+                'OH': { name: '오하이오', status: '스포츠 베팅만 합법', details: '최근 스포츠 베팅 세율 인상.' },
+                'NY': { name: '뉴욕', status: '스포츠 베팅만 합법', details: '높은 세율. iGaming 합법화 논의 지연.' },
+                'VT': { name: '버몬트', status: '스포츠 베팅만 합법', details: '최근 합법화된 주 중 하나.' },
+                'NH': { name: '뉴햄프셔', status: '스포츠 베팅만 합법', details: 'DraftKings 독점 계약.' },
+                'ME': { name: '메인', status: '스포츠 베팅만 합법', details: '부족에게 독점권 부여.' },
+                'MA': { name: '매사추세츠', status: '스포츠 베팅만 합법', details: '경쟁이 치열한 시장.' },
+                'CO': { name: '콜로라도', status: '스포츠 베팅만 합법', details: '다수의 사업자가 경쟁하는 개방형 시장.' },
+                'NE': { name: '네브래스카', status: '스포츠 베팅만 합법', details: '경마장 내에서만 허용.' },
+                'KS': { name: '캔자스', status: '스포츠 베팅만 합법', details: '2022년 합법화.' },
+                'KY': { name: '켄터키', status: '스포츠 베팅만 합법', details: '경마 산업과 연계.' },
+                'VA': { name: '버지니아', status: '스포츠 베팅만 합법', details: 'iGaming 법안 논의 없음.' },
+                'MD': { name: '메릴랜드', status: '스포츠 베팅만 합법', details: 'iGaming 법안 통과 실패.' },
+                'DC': { name: '워싱턴 D.C.', status: '스포츠 베팅만 합법', details: '제한적인 모델.' },
+                'AZ': { name: '애리조나', status: '스포츠 베팅만 합법', details: '프로 스포츠팀 및 부족과 파트너십.' },
+                'NM': { name: '뉴멕시코', status: '스포츠 베팅만 합법', details: '법적 회색지대에서 부족 카지노가 운영.' },
+                'AR': { name: '아칸소', status: '스포츠 베팅만 합법', details: '카지노 내에서만 허용.' },
+                'TN': { name: '테네시', status: '스포츠 베팅만 합법', details: '완전 온라인 모델.' },
+                'LA': { name: '루이지애나', status: '스포츠 베팅만 합법', details: '교구(카운티)별로 합법 여부 결정.' },
+                'MS': { name: '미시시피', status: '스포츠 베팅만 합법', details: '카지노 내에서만 허용.' },
+                'SC': { name: '사우스캐롤라이나', status: '스포츠 베팅만 합법', details: '제한적인 베팅 허용.' },
+                'NC': { name: '노스캐롤라이나', status: '스포츠 베팅만 합법', details: '최근 온라인 베팅 합법화.' },
+                'MN': { name: '미네소타', status: '불법', details: '합법화 논의 지지부진.' },
+                'WI': { name: '위스콘신', status: '불법', details: '부족 게이밍의 영향력이 강함.' },
+                'ID': { name: '아이다호', status: '불법', details: '가장 엄격한 갬블링 금지 주 중 하나.' },
+                'UT': { name: '유타', status: '불법', details: '종교적 이유로 모든 형태의 갬블링 금지.' },
+                'CA': { name: '캘리포니아', status: '불법', details: '부족과 카드룸 간의 이해관계 충돌로 합법화 실패.' },
+                'MO': { name: '미주리', status: '불법', details: '합법화 노력 반복적으로 실패.' },
+                'OK': { name: '오클라호마', status: '불법', details: '부족 게이밍이 지배적.' },
+                'TX': { name: '텍사스', status: '불법', details: '정치적 저항이 강함.' },
+                'AL': { name: '앨라배마', status: '불법', details: '보수적인 주로 합법화 가능성 낮음.' },
+                'GA': { name: '조지아', status: '불법', details: '합법화 논의 있으나 진전 없음.' },
+                'FL': { name: '플로리다', status: '불법', details: '세미놀 부족과의 독점 계약 관련 소송 진행 중.' }
+            };
+
+            const setActiveTab = (targetId) => {
+                navButtons.forEach(button => {
+                    button.classList.toggle('active', button.dataset.target === targetId);
+                });
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+            };
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    setActiveTab(button.dataset.target);
+                });
+            });
+
+            stateElements.forEach(stateEl => {
+                stateEl.addEventListener('click', () => {
+                    const stateCode = stateEl.dataset.state;
+                    const data = stateData[stateCode];
+                    if (data) {
+                        stateInfoPanel.innerHTML = `
+                            <h4 class="font-bold text-lg mb-1">${data.name} (${stateCode})</h4>
+                            <p class="font-semibold text-sm mb-2 ${
+                                data.status.includes('전체 합법') ? 'text-green-600' : 
+                                data.status.includes('포커만') ? 'text-blue-600' : 
+                                data.status.includes('스포츠') ? 'text-yellow-700' : 'text-gray-600'
+                            }">${data.status}</p>
+                            <p class="text-xs text-gray-700">${data.details}</p>
+                        `;
+                    }
+                });
+            });
+            
+            setActiveTab('intro');
+
+            const renderCharts = () => {
+                const taxCtx = document.getElementById('taxChart')?.getContext('2d');
+                if(taxCtx) {
+                    new Chart(taxCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['펜실베이니아 (슬롯)', '미시간 (최대)', '뉴저지'],
+                            datasets: [{
+                                label: 'iGaming 세율 (%)',
+                                data: [54, 28, 19.75],
+                                backgroundColor: ['#ef4444', '#f97316', '#facc15'],
+                                borderColor: ['#dc2626', '#ea580c', '#eab308'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    title: { display: true, text: '세율 (%)' }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                title: { display: true, text: '주별 iGaming 세율' }
+                            }
+                        }
+                    });
+                }
+
+                const licenseCtx = document.getElementById('licenseFeeChart')?.getContext('2d');
+                if(licenseCtx) {
+                    new Chart(licenseCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['펜실베이니아', '뉴저지', '미시간'],
+                            datasets: [{
+                                label: '초기 라이선스 비용 ($)',
+                                data: [10000000, 400000, 150000],
+                                backgroundColor: ['#8b5cf6', '#a855f7', '#d946ef'],
+                                borderColor: ['#7c3aed', '#9333ea', '#c026d3'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '$' + (value / 1000000) + 'M';
+                                        }
+                                    },
+                                    title: { display: true, text: '비용 (백만 달러)' }
+                                }
+                            },
+                             plugins: {
+                                legend: { display: false },
+                                title: { display: true, text: '초기 라이선스 비용' }
+                            }
+                        }
+                    });
+                }
+            };
+            
+            // Use an observer to render charts only when they become visible
+            // This prevents Chart.js errors when canvas is in a `display: none` container
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (entry.target.id === 'barriers') {
+                           renderCharts();
+                           observer.unobserve(entry.target); // No need to observe anymore
+                        }
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            const barriersSection = document.getElementById('barriers');
+            if(barriersSection) {
+                observer.observe(barriersSection);
+            }
+        });
+    </script>
+</body>
+</html>

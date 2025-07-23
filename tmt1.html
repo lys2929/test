@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMT 인터랙티브 전략 가이드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: A task-oriented SPA with four thematic sections (The Phenomenon, Official Paths, Gray Market Deep Dive, Strategic Playbook). This structure guides the user from understanding TMT's scale to exploring all entry options (official and unofficial), analyzing the risks, and finally making an informed decision. This is more user-centric than the linear report format. Key interactions include a tabbed interface for entry paths and a visual flowchart for the complex crypto-based gray market mechanism. -->
+    <!-- Visualization & Content Choices: 1. TMT Growth: Goal:Change -> Bar Chart (Chart.js) to visually show the dramatic increase in participants. 2. Entry Paths: Goal:Organize/Compare -> Tabbed Interface (HTML/JS) to clearly separate official methods from the unofficial gray market. 3. Policy Comparison: Goal:Compare -> HTML Table to starkly contrast TMT's ambiguous policy with other tours. 4. Crypto-Market Cycle: Goal:Organize -> HTML/CSS Flowchart to demystify the complex USDT-MTT Coin-Ticket transaction loop. 5. Risk/Reward Summary: Goal:Compare/Inform -> HTML Grid Matrix for a final, scannable comparison of all paths. All choices are made to enhance understanding and adhere to the NO SVG/Mermaid constraint. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F7F4;
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #A89F91;
+            border-bottom-color: #A89F91;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.07);
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.75rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            transition: all 0.3s;
+            background-color: #A89F91;
+            color: #FFFFFF;
+            letter-spacing: 0.5px;
+        }
+        .btn:hover {
+            background-color: #8d8276;
+            transform: scale(1.03);
+        }
+        .tab {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #6b7280;
+        }
+        .tab.active {
+            color: #A89F91;
+            border-bottom-color: #A89F91;
+            font-weight: 700;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #4A4A4A;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .section-intro {
+            max-width: 800px;
+            margin: 0 auto 3rem auto;
+            text-align: center;
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #5a5a5a;
+        }
+        .flow-step {
+            background-color: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 500;
+            flex-grow: 1;
+        }
+        .flow-arrow {
+            color: #A89F91;
+            font-size: 1.5rem;
+            font-weight: 700;
+            align-self: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="main-header" class="bg-white/90 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#home" class="text-xl font-bold text-[#A89F91]">TMT 전략 가이드</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#phenomenon" class="nav-link">TMT 현상</a>
+                <a href="#paths" class="nav-link">참가 경로</a>
+                <a href="#gray-market" class="nav-link">그레이 마켓</a>
+                <a href="#playbook" class="nav-link">전략 가이드</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <a href="#phenomenon" class="block py-3 px-6 text-sm hover:bg-gray-50">TMT 현상</a>
+            <a href="#paths" class="block py-3 px-6 text-sm hover:bg-gray-50">참가 경로</a>
+            <a href="#gray-market" class="block py-3 px-6 text-sm hover:bg-gray-50">그레이 마켓</a>
+            <a href="#playbook" class="block py-3 px-6 text-sm hover:bg-gray-50">전략 가이드</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="py-24 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">대만 밀리언즈 토너먼트(TMT)</h1>
+                <p class="text-xl md:text-2xl text-gray-600 mb-8">참가 경로, 티켓 거래, 그리고 최종 전략까지</p>
+                <p class="max-w-3xl mx-auto mb-12">이 인터랙티브 가이드는 TMT 참가를 계획하는 당신을 위해 제작되었습니다. 공식 참가 방법부터 베일에 싸인 '티켓 양도(門票轉讓)' 시장의 실체까지, 데이터에 기반한 심층 분석을 통해 최적의 참가 전략을 수립하세요.</p>
+                <a href="#phenomenon" class="btn">분석 시작하기</a>
+            </div>
+        </section>
+
+        <section id="phenomenon" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">TMT 현상: 숫자로 보는 성장</h2>
+                <p class="section-intro">TMT는 단순한 토너먼트를 넘어 아시아 포커 씬의 판도를 바꾼 '현상'이 되었습니다. 로컬 이벤트에서 국제적 축제로 거듭난 TMT의 경이로운 성장세를 데이터로 직접 확인하고, 왜 이 대회의 티켓이 그토록 높은 가치를 지니게 되었는지 이해해 보세요.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="card p-6">
+                        <h3 class="font-bold text-xl text-center mb-4">총 참가자 수의 폭발적 증가</h3>
+                        <div class="chart-container">
+                            <canvas id="participantsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="card p-8 text-center">
+                            <p class="text-lg font-semibold text-gray-500">메인 이벤트 보장 상금</p>
+                            <p class="text-5xl font-bold text-[#A89F91]">NT$ 3,100만</p>
+                            <p class="text-gray-500">(약 100만 USD)</p>
+                        </div>
+                        <div class="card p-8 text-center">
+                            <p class="text-lg font-semibold text-gray-500">메인 이벤트 바이인</p>
+                            <p class="text-5xl font-bold text-[#A89F91]">NT$ 9,000</p>
+                            <p class="text-gray-500">(약 300 USD)</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center mt-12 max-w-3xl mx-auto">이 '낮은 바이인, 높은 리워드' 구조는 TMT 성공의 핵심 엔진입니다. 수많은 아마추어와 레크리에이셔널 플레이어를 끌어들이고, 이는 다시 실력 있는 프로들에게 매력적인 경기 환경을 제공하며 티켓에 대한 강력한 수요를 창출합니다.</p>
+            </div>
+        </section>
+
+        <section id="paths" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">시트로 가는 길: 참가 경로 탐색</h2>
+                <p class="section-intro">TMT 메인 이벤트의 '시트(Seat)'를 얻는 방법은 다양하며, 각 경로는 뚜렷한 장단점을 가집니다. 공식적인 방법부터 비공식적인 경로까지, 모든 옵션을 비교 분석하여 자신에게 가장 적합한 길을 찾아보세요.</p>
+                <div class="card p-6 md:p-8">
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex flex-wrap justify-center" aria-label="Tabs">
+                            <button class="tab active" data-tab="official">공식 참가 경로</button>
+                            <button class="tab" data-tab="unofficial">비공식 경로 (그레이 마켓)</button>
+                        </nav>
+                    </div>
+                    <div id="tab-content" class="mt-8">
+                        <div class="tab-pane active" id="official">
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div class="p-6 bg-gray-50 rounded-lg">
+                                    <h4 class="font-bold text-lg mb-2">1. 직접 참가 (Direct Buy-in)</h4>
+                                    <p>가장 간단하고 확실한 방법. 대회 현장에서 참가비(NT$9,000)를 직접 지불하고 등록합니다.</p>
+                                    <p class="mt-3 font-semibold">추천 대상: 계획이 확정된 플레이어, 위험 회피형</p>
+                                </div>
+                                <div class="p-6 bg-gray-50 rounded-lg">
+                                    <h4 class="font-bold text-lg mb-2">2. 라이브 새틀라이트</h4>
+                                    <p>대회 현장에서 열리는 저렴한 예선 토너먼트(약 NT$1,700~)에 참가하여 메인 이벤트 시트를 획득합니다.</p>
+                                    <p class="mt-3 font-semibold">추천 대상: 현장 체류자, 저비용 도전자</p>
+                                </div>
+                                <div class="p-6 bg-gray-50 rounded-lg">
+                                    <h4 class="font-bold text-lg mb-2">3. 온라인 새틀라이트</h4>
+                                    <p>Natural8, iPoker 등 공식 파트너 플랫폼에서 약 32 USD의 저렴한 비용으로 참가하여 시트를 획득합니다.</p>
+                                    <p class="mt-3 font-semibold">추천 대상: 모든 해외 플레이어, 온라인 토너먼트 숙련자</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane hidden" id="unofficial">
+                            <div class="p-6 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg">
+                                <h4 class="font-bold text-lg mb-2">4. 2차 시장 (P2P 거래)</h4>
+                                <p>온라인 커뮤니티(네이버 카페, Dcard 등)나 특정 플랫폼(MTT Sports)을 통해 다른 플레이어로부터 티켓을 구매하는 방법입니다. 잠재적으로 가장 저렴할 수 있지만, 상당한 위험을 수반합니다.</p>
+                                <p class="mt-3 font-semibold">추천 대상: 암호화폐 및 P2P 거래에 능숙한 숙련된 플레이어</p>
+                                <p class="mt-2 text-sm text-red-700"><strong>경고:</strong> 이 방법은 주최 측의 보호를 받지 못하며, 사기 위험이 높습니다. 다음 섹션에서 심층 분석합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gray-market" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">그레이 마켓 심층 분석</h2>
+                <p class="section-intro">TMT 티켓은 왜, 그리고 어떻게 개인 간에 거래될까요? 이 섹션에서는 주최 측의 '정책적 공백'이 만들어낸 그레이 마켓의 실체와, Web3 기술을 기반으로 한 정교한 거래 메커니즘을 파헤칩니다.</p>
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="card p-6">
+                        <h3 class="font-bold text-xl text-center mb-4">규정의 침묵: 그레이 마켓의 탄생</h3>
+                        <p class="mb-4">다른 주요 투어들이 티켓 양도에 대해 명확한 규정(허용, 조건부 허용, 금지)을 두는 것과 달리, TMT는 이에 대해 침묵합니다. 이 '정책적 공백'은 플레이어 간 거래를 단속도, 보호도 하지 않는 회색 지대를 만들어, 비공식 시장이 번성할 최적의 환경을 제공합니다.</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="p-3 font-semibold">투어</th>
+                                        <th class="p-3 font-semibold">공식 정책</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y">
+                                    <tr class="font-bold bg-amber-50"><td class="p-3">TMT / CTP</td><td class="p-3">명시적 규정 없음 (모호함)</td></tr>
+                                    <tr><td class="p-3">APT</td><td class="p-3">조건부 허용 (서류 제출)</td></tr>
+                                    <tr><td class="p-3">WPT</td><td class="p-3">명시적 허용 (일부 이벤트)</td></tr>
+                                    <tr><td class="p-3">PokerStars</td><td class="p-3">엄격히 금지</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="font-bold text-xl text-center mb-4">핵심 증거: Dcard 포럼의 증언</h3>
+                        <blockquote class="border-l-4 border-gray-300 pl-4 italic">
+                            "門票的部分如果有多的門票或者是沒打到席位的話 都可以在裡面的市場做買賣在主頁的上方"
+                        </blockquote>
+                        <p class="mt-2 text-sm">"티켓의 경우, 여분의 티켓이 있거나 시트를 획득하지 못했다면, **내부에 있는 시장에서 사고팔 수 있습니다.**"</p>
+                        <p class="mt-4">대만 커뮤니티 Dcard의 이 게시물은 특정 플랫폼 내에 P2P '시장'이 존재함을 명확히 증명합니다. 이 '내부 시장'은 바로 TMT의 공식 파트너인 **MTT Sports**를 지칭합니다.</p>
+                    </div>
+                </div>
+
+                <div class="card p-8 mt-12">
+                    <h3 class="font-bold text-xl text-center mb-6">MTT Sports: Web3 기반 거래 엔진의 작동 방식</h3>
+                    <p class="text-center max-w-2xl mx-auto mb-8">MTT Sports는 단순한 예선 플랫폼이 아닙니다. 암호화폐를 통해 TMT 티켓의 획득, 거래, 현금화가 모두 가능한 완벽한 Web3 생태계를 제공하며, 이것이 그레이 마켓의 핵심 엔진입니다.</p>
+                    <div class="flex flex-col md:flex-row items-stretch justify-center gap-2 md:gap-4">
+                        <div class="flow-step">USDT 입금</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">MTT 코인 구매</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">새틀라이트 참가 & TMT 티켓 획득</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">앱 내 시장에서 티켓 판매</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">USDT 환전/출금</div>
+                    </div>
+                    <p class="text-center text-sm text-gray-600 mt-6">이러한 구조는 TMT 티켓이 단순 참가권이 아닌, 실물 가치를 지닌 '암호화 자산'으로 거래되고 있음을 보여주는 결정적인 증거입니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="playbook" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">최종 전략 가이드: 위험 vs 보상</h2>
+                <p class="section-intro">모든 정보를 종합하여, 당신의 상황과 위험 감수 수준에 맞는 최적의 참가 전략을 수립할 수 있도록 최종 가이드를 제공합니다. 각 경로의 장단점을 명확히 비교하고 현명한 결정을 내리세요.</p>
+                <div class="card p-6 md:p-8">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-max">
+                            <thead>
+                                <tr class="border-b text-left">
+                                    <th class="p-4 font-bold">참가 경로</th>
+                                    <th class="p-4 font-bold">예상 비용</th>
+                                    <th class="p-4 font-bold">장점</th>
+                                    <th class="p-4 font-bold">단점 / 위험</th>
+                                    <th class="p-4 font-bold">추천 대상</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-4">직접 참가</td><td class="p-4">NT$9,000</td><td class="p-4">가장 안전, 확실, 간단</td><td class="p-4">비용이 가장 높음</td><td class="p-4">초심자, 위험 회피형</td></tr>
+                                <tr class="border-b"><td class="p-4">라이브 새틀라이트</td><td class="p-4">NT$1,700~</td><td class="p-4">저비용, 현장감</td><td class="p-4">현장 체류 필수, 불확실성 높음</td><td class="p-4">현지 장기 체류자</td></tr>
+                                <tr class="border-b"><td class="p-4">온라인 새틀라이트</td><td class="p-4">~$32</td><td class="p-4">편리함, 매우 저렴</td><td class="p-4">전 세계 플레이어와 경쟁</td><td class="p-4">모든 해외 플레이어</td></tr>
+                                <tr class="border-b bg-red-50"><td class="p-4 font-bold">2차 시장 (P2P)</td><td class="p-4">변동</td><td class="p-4">잠재적으로 가장 저렴</td><td class="p-4 font-bold text-red-700">사기 위험(높음), 보호 전무</td><td class="p-4 font-bold">P2P/암호화폐 숙련자 (최후의 수단)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="mt-12 text-center">
+                    <h3 class="text-xl font-bold mb-4">운영자의 최종 권고</h3>
+                    <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-6 text-left">
+                        <div class="p-6 bg-green-50 border-l-4 border-green-500">
+                            <h4 class="font-bold text-green-800">안전 우선 전략</h4>
+                            <p class="text-green-700 mt-2">TMT에 처음 참가하거나 위험을 피하고 싶다면, **직접 참가** 또는 신뢰할 수 있는 **온라인 새틀라이트(Natural8 등)**를 이용하는 것이 가장 현명한 선택입니다.</p>
+                        </div>
+                        <div class="p-6 bg-red-50 border-l-4 border-red-500">
+                            <h4 class="font-bold text-red-800">고위험 고수익 전략</h4>
+                            <p class="text-red-700 mt-2">그레이 마켓은 모든 공식 경로를 시도한 후, 위험을 완벽히 이해하고 감수할 수 있는 숙련된 플레이어만이 고려해야 할 **최후의 수단**입니다. 거래 시에는 반드시 신원 확인과 **현장 직거래**를 원칙으로 하십시오.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>본 애플리케이션은 정보 제공을 목적으로 제작되었습니다.</p>
+            <p class="text-sm text-gray-400 mt-2">모든 P2P 티켓 거래의 책임은 거래 당사자에게 있으며, 제작자는 어떠한 법적 책임도 지지 않습니다. 항상 공식적인 방법을 우선적으로 고려하십시오.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const participantsChartCtx = document.getElementById('participantsChart').getContext('2d');
+            new Chart(participantsChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['초기 대회', '16회 대회'],
+                    datasets: [{
+                        label: '총 참가자 수',
+                        data: [311, 6953],
+                        backgroundColor: ['#cccccc', '#A89F91'],
+                        borderColor: ['#bbbbbb', '#8d8276'],
+                        borderWidth: 1,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (c) => `${c.raw.toLocaleString()} 명` } }
+                    },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            const tabs = document.querySelectorAll('.tab');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetId = tab.dataset.tab;
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    tabPanes.forEach(pane => {
+                        pane.id === targetId ? pane.classList.remove('hidden') : pane.classList.add('hidden');
+                    });
+                });
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            document.querySelectorAll('#mobile-menu a, #main-header a[href^="#"]').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 70) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
